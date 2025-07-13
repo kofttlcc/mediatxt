@@ -1,56 +1,43 @@
-name: Generate geosite domain-lists
+name: Generate domain-lists from v2fly/domain-list-community
 
 on:
   schedule:
-    - cron: '0 22 * * *'
+    - cron: '0 22 * * *'  # 每天 UTC 22:00
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout your repository
         uses: actions/checkout@v4
 
-      - name: Setup Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.21'
-          cache: false
-
-      - name: Install v2dat
+      - name: Clone v2fly/domain-list-community
         run: |
-          GO111MODULE=on go install github.com/urlesistiana/v2dat@latest
+          git clone --depth=1 https://github.com/v2fly/domain-list-community.git v2fly-data
 
-      - name: Download geosite.dat
-        run: |
-          wget -qO geosite.dat \
-            https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
-
-      - name: List available tags
-        run: |
-          v2dat list geosite -i geosite.dat
-
-      - name: Unpack domain lists
+      - name: Prepare output folder
         run: |
           mkdir -p output
-          v2dat unpack geosite -d output geosite.dat \
-            -f netflix -f youtube -f primevideo -f disney -f hbo
+
+      - name: Copy needed domain lists
+        run: |
+          cp v2fly-data/data/netflix output/Netflix.txt
+          cp v2fly-data/data/youtube output/YouTube.txt
+          cp v2fly-data/data/primevideo output/PrimeVideo.txt
+          cp v2fly-data/data/disney output/Disney.txt
+          cp v2fly-data/data/hbo output/HBO.txt
+          cp v2fly-data/data/openai output/OpenAI.txt
+          cp v2fly-data/data/tiktok output/TikTok.txt
+          cp v2fly-data/data/spotify output/Spotify.txt
 
       - name: Show output files
         run: |
           ls -l output
 
-      - name: Move to root
-        run: |
-          mv output/geosite_netflix.txt Netflix.txt || true
-          mv output/geosite_youtube.txt YouTube.txt || true
-          mv output/geosite_primevideo.txt PrimeVideo.txt || true
-          mv output/geosite_disney.txt Disney.txt || true
-          mv output/geosite_hbo.txt HBO.txt || true
-
       - name: Commit and Push
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Update geosite domain-lists"
-          file_pattern: '*.txt'
+          commit_message: "Update domain-lists from v2fly/domain-list-community"
+          file_pattern: 'output/*.txt'
