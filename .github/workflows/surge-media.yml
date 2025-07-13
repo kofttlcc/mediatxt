@@ -24,31 +24,44 @@ jobs:
         run: |
           mkdir -p output
 
+      # Netflix
       - name: Generate cleaned Netflix list
         run: |
-          grep '^full:' v2fly-data/data/netflix \
-            | sed 's/^full://' \
-            | sed 's/ //g' \
-            > output/Netflix.txt
+          cat v2fly-data/data/netflix | \
+            grep -E '^(full|suffix):' | \
+            sed 's/^[a-z]*://' | \
+            sed 's/ //g' | \
+            grep -Ev '[^a-zA-Z0-9.-]' | \
+            sort | uniq > output/Netflix.txt
 
+      # YouTube
       - name: Generate cleaned YouTube list
         run: |
-          grep '^full:' v2fly-data/data/youtube \
-            | sed 's/^full://' \
-            | sed 's/ //g' \
-            > output/YouTube.txt
+          cat v2fly-data/data/youtube | \
+            grep -E '^(full|suffix):' | \
+            sed 's/^[a-z]*://' | \
+            sed 's/ //g' | \
+            grep -Ev '[^a-zA-Z0-9.-]' | \
+            sort | uniq > output/YouTube.txt
 
+      # OpenAI
       - name: Generate cleaned OpenAI list
         run: |
-          grep '^full:' v2fly-data/data/openai \
-            | sed 's/^full://' \
-            | sed 's/ //g' \
-            > output/OpenAI.txt
+          cat v2fly-data/data/openai | \
+            grep -E '^(full|suffix):' | \
+            sed 's/^[a-z]*://' | \
+            sed 's/ //g' | \
+            grep -Ev '[^a-zA-Z0-9.-]' | \
+            sort | uniq > output/OpenAI.txt
 
       - name: Show output files
         run: |
-          ls -l output
+          echo "=== Netflix.txt ==="
           cat output/Netflix.txt
+          echo "=== YouTube.txt ==="
+          cat output/YouTube.txt
+          echo "=== OpenAI.txt ==="
+          cat output/OpenAI.txt
 
       - name: Commit and Push
         uses: stefanzweifel/git-auto-commit-action@v4
