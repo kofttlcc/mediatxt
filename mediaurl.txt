@@ -9,6 +9,8 @@ disneyplus.com
 primevideo.com
 amazonvideo.com
 hbo.com
+hbomax.com
+max.com
 hbogo.com
 hbonow.com
 youtube.com
