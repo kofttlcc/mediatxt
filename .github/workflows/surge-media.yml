@@ -2,7 +2,6 @@ name: Generate Surge domain-lists from v2fly/domain-list-community
 
 on:
   schedule:
-    - cron: '0 22 * * *'
   workflow_dispatch:
 
 permissions:
