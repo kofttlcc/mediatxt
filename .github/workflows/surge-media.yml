@@ -15,8 +15,8 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
-         go-version: '1.21'
-         cache: flase
+          go-version: '1.21'
+          cache: false
 
       - name: Install v2dat
         run: |
