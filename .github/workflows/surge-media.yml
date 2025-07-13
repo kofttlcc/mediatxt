@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir -p output
           v2dat unpack geosite -d output geosite.dat \
-            -f netflix -f youtube -f primevideo -f disney -f hbo -f openai
+            -f netflix -f youtube -f primevideo -f disney -f hbo
 
       - name: Move to root
         run: |
@@ -44,7 +44,6 @@ jobs:
           mv output/geosite_primevideo.txt PrimeVideo.txt || true
           mv output/geosite_disney.txt Disney.txt || true
           mv output/geosite_hbo.txt HBO.txt || true
-          mv output/geosite_openai.txt OpenAI.txt || true
 
       - name: Commit and Push
         uses: stefanzweifel/git-auto-commit-action@v4
