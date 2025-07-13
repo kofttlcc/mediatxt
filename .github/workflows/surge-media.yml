@@ -1,0 +1,43 @@
+name: Generate geosite domain-lists
+
+on:
+  schedule:
+    - cron: '0 22 * * *'  # 每天 UTC 22:00（北京时间次日早上6点）
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install v2dat
+        run: |
+          go install github.com/urlesistiana/v2dat@latest
+
+      - name: Download geosite.dat
+        run: |
+          wget -qO geosite.dat \
+            https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
+
+      - name: Unpack domain lists
+        run: |
+          mkdir -p output
+          v2dat unpack geosite -d output geosite.dat \
+            -f netflix -f youtube -f primevideo -f disney -f hbo -f openai
+
+      - name: Move to root
+        run: |
+          mv output/geosite_netflix.txt Netflix.txt || true
+          mv output/geosite_youtube.txt YouTube.txt || true
+          mv output/geosite_primevideo.txt PrimeVideo.txt || true
+          mv output/geosite_disney.txt Disney.txt || true
+          mv output/geosite_hbo.txt HBO.txt || true
+          mv output/geosite_openai.txt OpenAI.txt || true
+
+      - name: Commit and Push
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Update geosite domain-lists"
+          file_pattern: '*.txt'
