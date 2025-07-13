@@ -1,8 +1,8 @@
-name: Generate domain-lists from v2fly/domain-list-community
+name: Generate Surge domain-lists from v2fly/domain-list-community
 
 on:
   schedule:
-    - cron: '0 22 * * *'  # 每天 UTC 22:00
+    - cron: '0 22 * * *'
   workflow_dispatch:
 
 permissions:
@@ -24,23 +24,34 @@ jobs:
         run: |
           mkdir -p output
 
-      - name: Copy needed domain lists
+      - name: Generate cleaned Netflix list
         run: |
-          cp v2fly-data/data/netflix output/Netflix.txt
-          cp v2fly-data/data/youtube output/YouTube.txt
-          cp v2fly-data/data/primevideo output/PrimeVideo.txt
-          cp v2fly-data/data/disney output/Disney.txt
-          cp v2fly-data/data/hbo output/HBO.txt
-          cp v2fly-data/data/openai output/OpenAI.txt
-          cp v2fly-data/data/tiktok output/TikTok.txt
-          cp v2fly-data/data/spotify output/Spotify.txt
+          grep '^full:' v2fly-data/data/netflix \
+            | sed 's/^full://' \
+            | sed 's/ //g' \
+            > output/Netflix.txt
+
+      - name: Generate cleaned YouTube list
+        run: |
+          grep '^full:' v2fly-data/data/youtube \
+            | sed 's/^full://' \
+            | sed 's/ //g' \
+            > output/YouTube.txt
+
+      - name: Generate cleaned OpenAI list
+        run: |
+          grep '^full:' v2fly-data/data/openai \
+            | sed 's/^full://' \
+            | sed 's/ //g' \
+            > output/OpenAI.txt
 
       - name: Show output files
         run: |
           ls -l output
+          cat output/Netflix.txt
 
       - name: Commit and Push
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Update domain-lists from v2fly/domain-list-community"
+          commit_message: "Update cleaned domain-lists for Surge"
           file_pattern: 'output/*.txt'
