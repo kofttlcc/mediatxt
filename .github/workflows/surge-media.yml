@@ -2,7 +2,7 @@ name: Generate geosite domain-lists
 
 on:
   schedule:
-    - cron: '0 22 * * *'  # 每天 UTC 22:00（北京时间次日早上6点）
+    - cron: '0 22 * * *'
   workflow_dispatch:
 
 jobs:
@@ -22,21 +22,24 @@ jobs:
         run: |
           GO111MODULE=on go install github.com/urlesistiana/v2dat@latest
 
-      - name: Verify v2dat
-        run: |
-          which v2dat
-          v2dat --help
-
       - name: Download geosite.dat
         run: |
           wget -qO geosite.dat \
             https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
+
+      - name: List available tags
+        run: |
+          v2dat list geosite -i geosite.dat
 
       - name: Unpack domain lists
         run: |
           mkdir -p output
           v2dat unpack geosite -d output geosite.dat \
             -f netflix -f youtube -f primevideo -f disney -f hbo
+
+      - name: Show output files
+        run: |
+          ls -l output
 
       - name: Move to root
         run: |
